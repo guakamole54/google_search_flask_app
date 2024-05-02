@@ -22,7 +22,8 @@ def scrape_google(query: str):
     response = requests.get(f"https://www.google.com/search?q={query}", headers=headers)
 
     soup = BeautifulSoup(response.content, "html.parser")
-
+    print(soup)
+    print(soup.select(".g"))
     results = {}
     for num, el in enumerate(soup.select(".g")):
         results[num] = {}
