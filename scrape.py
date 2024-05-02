@@ -1,12 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import os
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static")
-CORS(app, resources={r"/search": {"origins": "http://localhost:5500"}})
+CORS(app)
+
+port = int(os.getenv("PORT", 10000))
 
 def scrape_google(query: str):
 
@@ -59,4 +62,4 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=5500)
+    app.run(debug=True, host="0.0.0.0", port=port)
