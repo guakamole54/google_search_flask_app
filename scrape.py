@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
-from fake_useragent import UserAgent
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
@@ -18,9 +17,6 @@ def index():
 def scrape_google(query: str):
     results = {}
 
-    #while len(results) == 0:
-
-        #ua = UserAgent()
     headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
         "accept-language": "en-US,en;q=0.9,cs;q=0.8,sk;q=0.7",
@@ -55,6 +51,30 @@ def scrape_google(query: str):
 
     return results
 
+def scrape_google_api(query):
+
+    google_api_key = os.getenv("GOOGLE_API_KEY")
+    google_api_engine = os.getenv("GOOGLE_API_ENGINE")
+
+    params = {"key": google_api_key, "cx": google_api_engine,
+            "q": query}
+
+    response = requests.get("https://www.googleapis.com/customsearch/v1", params=params)
+
+    json_response = response.json()
+
+    results = {}
+
+
+    for num, i in enumerate(json_response["items"]):
+        results[num] = {}
+
+        results[num]["title"] = i["title"]
+        results[num]["link"] = i["link"]
+        results[num]["snippet"] = i["snippet"]
+    
+    return results
+
 
 @app.route("/search", methods=["POST"])
 def search():
@@ -71,7 +91,7 @@ def search():
             return jsonify({"error": "No query provided"}), 400
 
         # Scrape Google for the query results
-        results = scrape_google(query)
+        results = scrape_google_api(query)
 
         # Save results to JSON
         filename = "search_results.json"
