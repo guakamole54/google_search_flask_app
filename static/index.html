@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search and Save</title>
+    <script>
+        function searchAndSave() {
+            const query = document.getElementById("search_query").value;
+
+            fetch('http://127.0.0.1:5500/search', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({"query": query})
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "search_results.json";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            });
+        }
+    </script>
+</head>
+<body>
+    <input type="text" id="search_query" placeholder="Enter search query">
+    <button onclick="searchAndSave()">Search and Save</button>
+</body>
+</html>
