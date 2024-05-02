@@ -9,7 +9,10 @@ from flask_cors import CORS
 app = Flask(__name__, static_folder="static")
 CORS(app)
 
-port = int(os.getenv("PORT", 10000))
+@app.route("/")
+def index():
+    return app.send_static_file("index.html")
+
 
 def scrape_google(query: str):
 
@@ -62,4 +65,5 @@ def search():
 
 
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", 10000))
     app.run(debug=True, host="0.0.0.0", port=port)
