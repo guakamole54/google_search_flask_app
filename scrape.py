@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+from fake_useragent import UserAgent
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
@@ -15,24 +16,32 @@ def index():
 
 
 def scrape_google(query: str):
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4703.0 Safari/537.36"
-    }
-    response = requests.get(f"https://www.google.com/search?q={query}", headers=headers)
-
-    soup = BeautifulSoup(response.content, "html.parser")
-    print(soup)
-    print(soup.select(".g"))
     results = {}
-    for num, el in enumerate(soup.select(".g")):
-        results[num] = {}
-        try:
-            results[num]["title"] = el.select_one("h3").text
-            results[num]["description"] = el.select_one(".VwiC3b").text
-            results[num]["url"] = el.select_one("a")["href"]
-        except AttributeError:
-            pass
+
+    while len(results) == 0:
+
+        ua = UserAgent()
+        headers = {
+            "User-Agent": ua.random
+            #"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582"
+            # "User-agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0) Gecko/20100101 Firefox/36.0",
+            #"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4703.0 Safari/537.36",
+            # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
+        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers)
+
+        soup = BeautifulSoup(response.content, "html.parser")
+        #print(soup)
+        #print(soup.select(".g"))
+
+        for num, el in enumerate(soup.select(".g")):
+            results[num] = {}
+            try:
+                results[num]["title"] = el.select_one("h3").text
+                results[num]["description"] = el.select_one(".VwiC3b").text
+                results[num]["url"] = el.select_one("a")["href"]
+            except AttributeError:
+                pass
 
     return results
 

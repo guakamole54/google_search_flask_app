@@ -4,3 +4,4 @@ bs4
 #json
 flask
 flask_cors
+fake_useragent
