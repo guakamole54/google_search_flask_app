@@ -1,6 +1,6 @@
 ## Dependencies
-requests==2.31.0
+requests
 bs4
-json==2.0.9
-flask==2.2.5
-flask_cors==4.0.0
+json
+flask
+flask_cors
